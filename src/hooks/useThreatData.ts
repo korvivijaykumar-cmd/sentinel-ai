@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 export interface Threat {
   id: string;
@@ -65,7 +65,7 @@ const generatePacket = (): NetworkPacket => ({
   status: Math.random() > 0.95 ? 'blocked' : Math.random() > 0.85 ? 'suspicious' : 'normal',
 });
 
-export const useThreatData = () => {
+export const useThreatData = (onNewThreat?: (threat: Threat) => void) => {
   const [threats, setThreats] = useState<Threat[]>([]);
   const [packets, setPackets] = useState<NetworkPacket[]>([]);
   const [stats, setStats] = useState<ThreatStats>({
@@ -77,6 +77,12 @@ export const useThreatData = () => {
     threatsBySeverity: {},
   });
   const [isMonitoring, setIsMonitoring] = useState(true);
+  const onNewThreatRef = useRef(onNewThreat);
+  
+  // Keep callback ref updated
+  useEffect(() => {
+    onNewThreatRef.current = onNewThreat;
+  }, [onNewThreat]);
 
   const calculateStats = useCallback((currentThreats: Threat[], packetsCount: number) => {
     const threatsByType: Record<string, number> = {};
@@ -118,6 +124,8 @@ export const useThreatData = () => {
           calculateStats(updated, packets.length);
           return updated;
         });
+        // Notify about new threat
+        onNewThreatRef.current?.(newThreat);
       }
     }, 3000);
 

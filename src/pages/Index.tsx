@@ -1,5 +1,6 @@
 import { Shield, ShieldAlert, ShieldCheck, Activity } from 'lucide-react';
 import { useThreatData } from '@/hooks/useThreatData';
+import { useNotifications } from '@/hooks/useNotifications';
 import { Header } from '@/components/dashboard/Header';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { ThreatAlert } from '@/components/dashboard/ThreatAlert';
@@ -10,11 +11,33 @@ import { ThreatMap } from '@/components/dashboard/ThreatMap';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 const Index = () => {
-  const { threats, packets, stats, isMonitoring, toggleMonitoring, blockThreat } = useThreatData();
+  const {
+    settings,
+    permissionStatus,
+    notifyThreat,
+    toggleSound,
+    toggleBrowserNotifications,
+    updateSettings,
+    playAlertSound,
+  } = useNotifications();
+
+  const { threats, packets, stats, isMonitoring, toggleMonitoring, blockThreat } = useThreatData(notifyThreat);
+
+  const notificationProps = {
+    soundEnabled: settings.soundEnabled,
+    browserNotificationsEnabled: settings.browserNotificationsEnabled,
+    notifyOnCritical: settings.notifyOnCritical,
+    notifyOnHigh: settings.notifyOnHigh,
+    permissionStatus,
+    onToggleSound: toggleSound,
+    onToggleBrowserNotifications: toggleBrowserNotifications,
+    onUpdateSettings: updateSettings,
+    onTestSound: () => playAlertSound('critical'),
+  };
 
   return (
     <div className="min-h-screen bg-background">
-      <Header isMonitoring={isMonitoring} onToggleMonitoring={toggleMonitoring} />
+      <Header isMonitoring={isMonitoring} onToggleMonitoring={toggleMonitoring} notificationProps={notificationProps} />
       
       <main className="container mx-auto px-4 py-6">
         {/* Stats Grid */}

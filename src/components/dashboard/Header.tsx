@@ -1,13 +1,25 @@
-import { Shield, Power, Bell, Settings, Activity } from 'lucide-react';
+import { Shield, Power, Settings, Activity } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { NotificationSettings } from './NotificationSettings';
 
 interface HeaderProps {
   isMonitoring: boolean;
   onToggleMonitoring: () => void;
+  notificationProps?: {
+    soundEnabled: boolean;
+    browserNotificationsEnabled: boolean;
+    notifyOnCritical: boolean;
+    notifyOnHigh: boolean;
+    permissionStatus: NotificationPermission;
+    onToggleSound: () => void;
+    onToggleBrowserNotifications: () => void;
+    onUpdateSettings: (settings: { notifyOnCritical?: boolean; notifyOnHigh?: boolean }) => void;
+    onTestSound: () => void;
+  };
 }
 
-export const Header = ({ isMonitoring, onToggleMonitoring }: HeaderProps) => {
+export const Header = ({ isMonitoring, onToggleMonitoring, notificationProps }: HeaderProps) => {
   return (
     <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
       <div className="container mx-auto px-4 py-4">
@@ -47,10 +59,9 @@ export const Header = ({ isMonitoring, onToggleMonitoring }: HeaderProps) => {
               {isMonitoring ? 'Stop' : 'Start'}
             </Button>
             
-            <Button variant="ghost" size="icon" className="relative">
-              <Bell className="w-5 h-5" />
-              <span className="absolute top-1 right-1 w-2 h-2 bg-destructive rounded-full" />
-            </Button>
+            {notificationProps && (
+              <NotificationSettings {...notificationProps} />
+            )}
             
             <Button variant="ghost" size="icon">
               <Settings className="w-5 h-5" />
