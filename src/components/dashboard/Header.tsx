@@ -2,6 +2,7 @@ import { Shield, Power, Settings, Activity } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { NotificationSettings } from './NotificationSettings';
+import { UserMenu } from './UserMenu';
 
 interface HeaderProps {
   isMonitoring: boolean;
@@ -66,6 +67,8 @@ export const Header = ({ isMonitoring, onToggleMonitoring, notificationProps }: 
             <Button variant="ghost" size="icon">
               <Settings className="w-5 h-5" />
             </Button>
+
+            <UserMenu />
           </div>
         </div>
       </div>
