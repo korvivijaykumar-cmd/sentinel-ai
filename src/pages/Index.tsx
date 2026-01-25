@@ -7,7 +7,6 @@ import { ThreatAlert } from '@/components/dashboard/ThreatAlert';
 import { NetworkTrafficChart } from '@/components/dashboard/NetworkTrafficChart';
 import { PacketStream } from '@/components/dashboard/PacketStream';
 import { ThreatDistribution } from '@/components/dashboard/ThreatDistribution';
-import { ThreatMap } from '@/components/dashboard/ThreatMap';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 const Index = () => {
@@ -100,9 +99,8 @@ const Index = () => {
             </div>
           </div>
 
-          {/* Right Column - Map, Distribution & Stream */}
+          {/* Right Column - Distribution & Stream */}
           <div className="space-y-6">
-            <ThreatMap threats={threats} />
             <ThreatDistribution stats={stats} />
             <PacketStream packets={packets} />
           </div>
