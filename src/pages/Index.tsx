@@ -1,5 +1,5 @@
 import { Shield, ShieldAlert, ShieldCheck, Activity } from 'lucide-react';
-import { useThreatData } from '@/hooks/useThreatData';
+import { useThreatData, Threat } from '@/hooks/useThreatData';
 import { useNotifications } from '@/hooks/useNotifications';
 import { Header } from '@/components/dashboard/Header';
 import { StatCard } from '@/components/dashboard/StatCard';
@@ -7,7 +7,9 @@ import { ThreatAlert } from '@/components/dashboard/ThreatAlert';
 import { NetworkTrafficChart } from '@/components/dashboard/NetworkTrafficChart';
 import { PacketStream } from '@/components/dashboard/PacketStream';
 import { ThreatDistribution } from '@/components/dashboard/ThreatDistribution';
+import { AIAnalysisPanel } from '@/components/dashboard/AIAnalysisPanel';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { useState, useCallback } from 'react';
 
 const Index = () => {
   const {
@@ -21,6 +23,15 @@ const Index = () => {
   } = useNotifications();
 
   const { threats, packets, stats, isMonitoring, toggleMonitoring, blockThreat } = useThreatData(notifyThreat);
+  const [aiThreats, setAiThreats] = useState<Threat[]>([]);
+
+  const handleAIThreatDetected = useCallback((threat: Threat) => {
+    setAiThreats(prev => [threat, ...prev].slice(0, 20));
+    notifyThreat(threat);
+  }, [notifyThreat]);
+
+  // Combine AI-detected threats with simulated threats
+  const allThreats = [...aiThreats, ...threats];
 
   const notificationProps = {
     soundEnabled: settings.soundEnabled,
@@ -87,7 +98,7 @@ const Index = () => {
               </div>
               <ScrollArea className="h-80">
                 <div className="space-y-3 pr-4">
-                  {threats.slice(0, 10).map(threat => (
+                  {allThreats.slice(0, 10).map(threat => (
                     <ThreatAlert
                       key={threat.id}
                       threat={threat}
@@ -99,8 +110,12 @@ const Index = () => {
             </div>
           </div>
 
-          {/* Right Column - Distribution & Stream */}
+          {/* Right Column - AI Analysis, Distribution & Stream */}
           <div className="space-y-6">
+            <AIAnalysisPanel 
+              packets={packets} 
+              onThreatDetected={handleAIThreatDetected} 
+            />
             <ThreatDistribution stats={stats} />
             <PacketStream packets={packets} />
           </div>
