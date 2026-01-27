@@ -27,8 +27,7 @@ const Index = () => {
 
   const handleAIThreatDetected = useCallback((threat: Threat) => {
     setAiThreats(prev => [threat, ...prev].slice(0, 20));
-    notifyThreat(threat);
-  }, [notifyThreat]);
+  }, []);
 
   // Combine AI-detected threats with simulated threats
   const allThreats = [...aiThreats, ...threats];
@@ -114,6 +113,7 @@ const Index = () => {
           <div className="space-y-6">
             <AIAnalysisPanel 
               packets={packets} 
+              isMonitoring={isMonitoring}
               onThreatDetected={handleAIThreatDetected} 
             />
             <ThreatDistribution stats={stats} />
