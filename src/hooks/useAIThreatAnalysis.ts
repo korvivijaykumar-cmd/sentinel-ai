@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { NetworkPacket, Threat } from './useThreatData';
 import { toast } from 'sonner';
@@ -20,13 +20,44 @@ export interface AnalysisResult {
   timestamp: string;
 }
 
-export const useAIThreatAnalysis = () => {
+export interface AnalysisSettings {
+  autoAnalysisEnabled: boolean;
+  frequencySeconds: number;
+  minPacketsForAnalysis: number;
+}
+
+const DEFAULT_SETTINGS: AnalysisSettings = {
+  autoAnalysisEnabled: false,
+  frequencySeconds: 30,
+  minPacketsForAnalysis: 5,
+};
+
+export const useAIThreatAnalysis = (
+  packets: NetworkPacket[] = [],
+  isMonitoring: boolean = false,
+  onThreatDetected?: (threat: Threat) => void
+) => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [lastAnalysis, setLastAnalysis] = useState<AnalysisResult | null>(null);
   const [analysisHistory, setAnalysisHistory] = useState<AnalysisResult[]>([]);
+  const [settings, setSettings] = useState<AnalysisSettings>(DEFAULT_SETTINGS);
+  const [nextAnalysisIn, setNextAnalysisIn] = useState<number | null>(null);
+  const packetsRef = useRef(packets);
+  const onThreatDetectedRef = useRef(onThreatDetected);
 
-  const analyzePackets = useCallback(async (packets: NetworkPacket[]): Promise<Threat | null> => {
-    if (packets.length === 0) {
+  // Keep refs updated
+  useEffect(() => {
+    packetsRef.current = packets;
+  }, [packets]);
+
+  useEffect(() => {
+    onThreatDetectedRef.current = onThreatDetected;
+  }, [onThreatDetected]);
+
+  const analyzePackets = useCallback(async (packetsToAnalyze?: NetworkPacket[]): Promise<Threat | null> => {
+    const targetPackets = packetsToAnalyze || packetsRef.current;
+    
+    if (targetPackets.length === 0) {
       console.log('No packets to analyze');
       return null;
     }
@@ -35,7 +66,7 @@ export const useAIThreatAnalysis = () => {
 
     try {
       // Prepare packets for analysis - serialize dates
-      const serializedPackets = packets.map(p => ({
+      const serializedPackets = targetPackets.slice(0, 20).map(p => ({
         ...p,
         timestamp: p.timestamp instanceof Date ? p.timestamp.toISOString() : p.timestamp,
       }));
@@ -62,14 +93,14 @@ export const useAIThreatAnalysis = () => {
           id: crypto.randomUUID(),
           type: result.analysis.threatType,
           severity: result.analysis.severity,
-          source: packets[0]?.source || 'Unknown',
+          source: targetPackets[0]?.source || 'Unknown',
           sourceCountry: 'AI Detected',
-          target: packets[0]?.destination || 'Unknown',
+          target: targetPackets[0]?.destination || 'Unknown',
           timestamp: new Date(),
           status: 'active',
           description: `[AI] ${result.analysis.description}`,
           port: 0,
-          protocol: packets[0]?.protocol || 'Unknown',
+          protocol: targetPackets[0]?.protocol || 'Unknown',
         };
 
         toast.warning('AI Threat Detected', {
@@ -77,6 +108,7 @@ export const useAIThreatAnalysis = () => {
           duration: 8000,
         });
 
+        onThreatDetectedRef.current?.(detectedThreat);
         return detectedThreat;
       }
 
@@ -92,6 +124,42 @@ export const useAIThreatAnalysis = () => {
     }
   }, []);
 
+  // Auto-analysis effect
+  useEffect(() => {
+    if (!settings.autoAnalysisEnabled || !isMonitoring) {
+      setNextAnalysisIn(null);
+      return;
+    }
+
+    let countdown = settings.frequencySeconds;
+    setNextAnalysisIn(countdown);
+
+    const countdownInterval = setInterval(() => {
+      countdown -= 1;
+      setNextAnalysisIn(countdown);
+
+      if (countdown <= 0) {
+        countdown = settings.frequencySeconds;
+        setNextAnalysisIn(countdown);
+        
+        // Only analyze if we have enough packets
+        if (packetsRef.current.length >= settings.minPacketsForAnalysis && !isAnalyzing) {
+          analyzePackets();
+        }
+      }
+    }, 1000);
+
+    return () => clearInterval(countdownInterval);
+  }, [settings.autoAnalysisEnabled, settings.frequencySeconds, settings.minPacketsForAnalysis, isMonitoring, isAnalyzing, analyzePackets]);
+
+  const updateSettings = useCallback((updates: Partial<AnalysisSettings>) => {
+    setSettings(prev => ({ ...prev, ...updates }));
+  }, []);
+
+  const toggleAutoAnalysis = useCallback(() => {
+    setSettings(prev => ({ ...prev, autoAnalysisEnabled: !prev.autoAnalysisEnabled }));
+  }, []);
+
   const clearHistory = useCallback(() => {
     setAnalysisHistory([]);
     setLastAnalysis(null);
@@ -103,5 +171,9 @@ export const useAIThreatAnalysis = () => {
     lastAnalysis,
     analysisHistory,
     clearHistory,
+    settings,
+    updateSettings,
+    toggleAutoAnalysis,
+    nextAnalysisIn,
   };
 };

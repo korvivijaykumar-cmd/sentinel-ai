@@ -1,13 +1,19 @@
-import { Brain, Loader2, AlertTriangle, Shield, Activity } from 'lucide-react';
+import { Brain, Loader2, AlertTriangle, Shield, Activity, Settings, Timer, Play, Pause } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { NetworkPacket } from '@/hooks/useThreatData';
+import { NetworkPacket, Threat } from '@/hooks/useThreatData';
 import { useAIThreatAnalysis, AnalysisResult } from '@/hooks/useAIThreatAnalysis';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { useState } from 'react';
 
 interface AIAnalysisPanelProps {
   packets: NetworkPacket[];
-  onThreatDetected?: (threat: any) => void;
+  isMonitoring: boolean;
+  onThreatDetected?: (threat: Threat) => void;
 }
 
 const severityColors = {
@@ -17,16 +23,37 @@ const severityColors = {
   low: 'text-muted-foreground bg-muted',
 };
 
-export const AIAnalysisPanel = ({ packets, onThreatDetected }: AIAnalysisPanelProps) => {
-  const { analyzePackets, isAnalyzing, lastAnalysis, analysisHistory } = useAIThreatAnalysis();
+const frequencyOptions = [
+  { value: '15', label: '15 seconds' },
+  { value: '30', label: '30 seconds' },
+  { value: '60', label: '1 minute' },
+  { value: '120', label: '2 minutes' },
+  { value: '300', label: '5 minutes' },
+];
 
-  const handleAnalyze = async () => {
-    // Take the most recent packets for analysis
-    const recentPackets = packets.slice(0, 20);
-    const threat = await analyzePackets(recentPackets);
-    if (threat && onThreatDetected) {
-      onThreatDetected(threat);
-    }
+export const AIAnalysisPanel = ({ packets, isMonitoring, onThreatDetected }: AIAnalysisPanelProps) => {
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  
+  const { 
+    analyzePackets, 
+    isAnalyzing, 
+    lastAnalysis, 
+    analysisHistory,
+    settings,
+    updateSettings,
+    toggleAutoAnalysis,
+    nextAnalysisIn,
+  } = useAIThreatAnalysis(packets, isMonitoring, onThreatDetected);
+
+  const handleManualAnalyze = async () => {
+    await analyzePackets();
+  };
+
+  const formatCountdown = (seconds: number | null) => {
+    if (seconds === null) return '--';
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return mins > 0 ? `${mins}:${secs.toString().padStart(2, '0')}` : `${secs}s`;
   };
 
   return (
@@ -36,25 +63,140 @@ export const AIAnalysisPanel = ({ packets, onThreatDetected }: AIAnalysisPanelPr
           <Brain className="w-5 h-5 text-primary" />
           <h3 className="text-lg font-semibold">AI Threat Analysis</h3>
         </div>
-        <Button 
-          onClick={handleAnalyze} 
-          disabled={isAnalyzing || packets.length === 0}
-          size="sm"
-          className="gap-2"
-        >
-          {isAnalyzing ? (
-            <>
-              <Loader2 className="w-4 h-4 animate-spin" />
-              Analyzing...
-            </>
-          ) : (
-            <>
-              <Activity className="w-4 h-4" />
-              Analyze Packets
-            </>
-          )}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button 
+            onClick={handleManualAnalyze} 
+            disabled={isAnalyzing || packets.length === 0}
+            size="sm"
+            variant="outline"
+            className="gap-2"
+          >
+            {isAnalyzing ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Analyzing...
+              </>
+            ) : (
+              <>
+                <Activity className="w-4 h-4" />
+                Analyze
+              </>
+            )}
+          </Button>
+        </div>
       </div>
+
+      {/* Auto-analysis status bar */}
+      <div className={cn(
+        'flex items-center justify-between p-3 rounded-lg mb-4 border',
+        settings.autoAnalysisEnabled && isMonitoring
+          ? 'bg-primary/10 border-primary/30'
+          : 'bg-muted/50 border-border'
+      )}>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={toggleAutoAnalysis}
+            className={cn(
+              'w-8 h-8 rounded-full flex items-center justify-center transition-all',
+              settings.autoAnalysisEnabled && isMonitoring
+                ? 'bg-primary text-primary-foreground'
+                : 'bg-muted text-muted-foreground hover:bg-muted/80'
+            )}
+          >
+            {settings.autoAnalysisEnabled && isMonitoring ? (
+              <Pause className="w-4 h-4" />
+            ) : (
+              <Play className="w-4 h-4" />
+            )}
+          </button>
+          <div>
+            <p className="text-sm font-medium">
+              {settings.autoAnalysisEnabled && isMonitoring ? 'Auto-Analysis Active' : 'Auto-Analysis Paused'}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {settings.autoAnalysisEnabled && isMonitoring 
+                ? `Next scan in ${formatCountdown(nextAnalysisIn)}`
+                : `Interval: ${settings.frequencySeconds}s`
+              }
+            </p>
+          </div>
+        </div>
+        {settings.autoAnalysisEnabled && isMonitoring && nextAnalysisIn !== null && (
+          <div className="flex items-center gap-2">
+            <Timer className="w-4 h-4 text-primary" />
+            <div className="w-16 h-1.5 bg-muted rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-primary transition-all duration-1000 ease-linear"
+                style={{ 
+                  width: `${((settings.frequencySeconds - nextAnalysisIn) / settings.frequencySeconds) * 100}%` 
+                }}
+              />
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Settings collapsible */}
+      <Collapsible open={settingsOpen} onOpenChange={setSettingsOpen} className="mb-4">
+        <CollapsibleTrigger asChild>
+          <Button variant="ghost" size="sm" className="w-full justify-between">
+            <span className="flex items-center gap-2">
+              <Settings className="w-4 h-4" />
+              Analysis Settings
+            </span>
+            <span className="text-xs text-muted-foreground">
+              {settingsOpen ? 'Hide' : 'Show'}
+            </span>
+          </Button>
+        </CollapsibleTrigger>
+        <CollapsibleContent className="pt-3 space-y-4">
+          <div className="flex items-center justify-between">
+            <Label htmlFor="auto-analysis" className="text-sm">Enable Auto-Analysis</Label>
+            <Switch
+              id="auto-analysis"
+              checked={settings.autoAnalysisEnabled}
+              onCheckedChange={toggleAutoAnalysis}
+            />
+          </div>
+          
+          <div className="space-y-2">
+            <Label className="text-sm">Scan Frequency</Label>
+            <Select
+              value={settings.frequencySeconds.toString()}
+              onValueChange={(value) => updateSettings({ frequencySeconds: parseInt(value) })}
+            >
+              <SelectTrigger className="bg-background">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-popover border border-border z-50">
+                {frequencyOptions.map(opt => (
+                  <SelectItem key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-sm">Min Packets for Analysis</Label>
+            <Select
+              value={settings.minPacketsForAnalysis.toString()}
+              onValueChange={(value) => updateSettings({ minPacketsForAnalysis: parseInt(value) })}
+            >
+              <SelectTrigger className="bg-background">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-popover border border-border z-50">
+                <SelectItem value="3">3 packets</SelectItem>
+                <SelectItem value="5">5 packets</SelectItem>
+                <SelectItem value="10">10 packets</SelectItem>
+                <SelectItem value="20">20 packets</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </CollapsibleContent>
+      </Collapsible>
 
       <div className="text-xs text-muted-foreground mb-4">
         Powered by SENTINEL ML • {packets.length} packets available
