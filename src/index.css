@@ -6,6 +6,64 @@
 
 @layer base {
   :root {
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
+
+    --card: 0 0% 98%;
+    --card-foreground: 222 47% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    --primary: 187 85% 43%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 222 47% 11%;
+
+    --muted: 220 14% 96%;
+    --muted-foreground: 215 16% 47%;
+
+    --accent: 187 85% 43%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 187 85% 43%;
+
+    --radius: 0.5rem;
+
+    /* Custom cyber theme tokens - light mode */
+    --cyber-glow: 0 0 20px hsl(187 85% 43% / 0.2);
+    --cyber-glow-strong: 0 0 30px hsl(187 85% 43% / 0.3);
+    --threat-glow: 0 0 20px hsl(0 84% 60% / 0.2);
+    --warning-glow: 0 0 20px hsl(38 92% 50% / 0.2);
+    --success-glow: 0 0 20px hsl(142 76% 36% / 0.2);
+    
+    --gradient-cyber: linear-gradient(135deg, hsl(187 85% 43% / 0.05), hsl(0 0% 98%));
+    --gradient-threat: linear-gradient(135deg, hsl(0 84% 60% / 0.08), hsl(0 0% 98%));
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%), hsl(0 0% 98%));
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 222 47% 11%;
+    --sidebar-primary: 187 85% 43%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 14% 96%;
+    --sidebar-accent-foreground: 222 47% 11%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 187 85% 43%;
+  }
+
+  .dark {
     --background: 222 47% 6%;
     --foreground: 210 40% 98%;
 
@@ -40,9 +98,7 @@
     --input: 222 47% 18%;
     --ring: 187 85% 53%;
 
-    --radius: 0.5rem;
-
-    /* Custom cyber theme tokens */
+    /* Custom cyber theme tokens - dark mode */
     --cyber-glow: 0 0 20px hsl(187 85% 53% / 0.3);
     --cyber-glow-strong: 0 0 30px hsl(187 85% 53% / 0.5);
     --threat-glow: 0 0 20px hsl(0 84% 60% / 0.4);
@@ -61,11 +117,6 @@
     --sidebar-accent-foreground: 210 40% 98%;
     --sidebar-border: 222 47% 18%;
     --sidebar-ring: 187 85% 53%;
-  }
-
-  .dark {
-    --background: 222 47% 6%;
-    --foreground: 210 40% 98%;
   }
 }
 
