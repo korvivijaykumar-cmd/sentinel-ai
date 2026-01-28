@@ -39,27 +39,29 @@ export const NetworkTrafficChart = () => {
   }, []);
 
   return (
-    <div className="cyber-card h-full">
-      <div className="flex items-center gap-2 mb-4">
-        <Activity className="w-5 h-5 text-primary" />
-        <h3 className="text-lg font-semibold">Network Traffic</h3>
-        <div className="ml-auto flex gap-4 text-xs">
+    <div className="cyber-card">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-4">
+        <div className="flex items-center gap-2">
+          <Activity className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+          <h3 className="text-base sm:text-lg font-semibold">Network Traffic</h3>
+        </div>
+        <div className="flex gap-3 sm:gap-4 text-xs sm:ml-auto">
           <span className="flex items-center gap-1">
-            <span className="w-3 h-3 rounded-full bg-primary" />
+            <span className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-primary" />
             Inbound
           </span>
           <span className="flex items-center gap-1">
-            <span className="w-3 h-3 rounded-full bg-success" />
+            <span className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-success" />
             Outbound
           </span>
           <span className="flex items-center gap-1">
-            <span className="w-3 h-3 rounded-full bg-destructive" />
+            <span className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-destructive" />
             Blocked
           </span>
         </div>
       </div>
       
-      <div className="h-64">
+      <div className="h-48 sm:h-64">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
             <defs>

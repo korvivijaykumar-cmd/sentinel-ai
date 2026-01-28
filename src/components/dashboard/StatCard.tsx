@@ -36,28 +36,28 @@ export const StatCard = ({
   className,
 }: StatCardProps) => {
   return (
-    <div className={cn('cyber-card group hover:border-primary/50 transition-all duration-300', className)}>
-      <div className="flex items-start justify-between">
-        <div className="space-y-2">
-          <p className="text-sm text-muted-foreground font-medium">{title}</p>
-          <p className={cn('stat-value', variantStyles[variant])}>
+    <div className={cn('cyber-card group hover:border-primary/50 transition-all duration-300 p-3 sm:p-4', className)}>
+      <div className="flex items-start justify-between gap-2">
+        <div className="space-y-1 sm:space-y-2 min-w-0 flex-1">
+          <p className="text-xs sm:text-sm text-muted-foreground font-medium truncate">{title}</p>
+          <p className={cn('text-xl sm:text-3xl font-bold font-mono tracking-tight', variantStyles[variant])}>
             {typeof value === 'number' ? value.toLocaleString() : value}
           </p>
           {trend && (
             <p className={cn(
-              'text-xs font-medium',
+              'text-[10px] sm:text-xs font-medium',
               trend.isPositive ? 'text-success' : 'text-destructive'
             )}>
-              {trend.isPositive ? '↑' : '↓'} {Math.abs(trend.value)}% from last hour
+              {trend.isPositive ? '↑' : '↓'} {Math.abs(trend.value)}%
             </p>
           )}
         </div>
         <div className={cn(
-          'p-3 rounded-lg transition-all duration-300',
+          'p-2 sm:p-3 rounded-lg transition-all duration-300 shrink-0',
           iconBgStyles[variant],
           'group-hover:scale-110'
         )}>
-          <Icon className={cn('w-6 h-6', variantStyles[variant].split(' ')[0])} />
+          <Icon className={cn('w-4 h-4 sm:w-6 sm:h-6', variantStyles[variant].split(' ')[0])} />
         </div>
       </div>
     </div>

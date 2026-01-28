@@ -45,34 +45,34 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       <Header isMonitoring={isMonitoring} onToggleMonitoring={toggleMonitoring} notificationProps={notificationProps} />
       
-      <main className="container mx-auto px-4 py-6">
+      <main className="container mx-auto px-4 py-4 sm:py-6 flex-1 pb-16">
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6">
           <StatCard
-            title="Total Threats Detected"
+            title="Total Threats"
             value={stats.totalThreats}
             icon={ShieldAlert}
             variant="danger"
             trend={{ value: 12, isPositive: false }}
           />
           <StatCard
-            title="Threats Blocked"
+            title="Blocked"
             value={stats.blockedThreats}
             icon={ShieldCheck}
             variant="success"
             trend={{ value: 8, isPositive: true }}
           />
           <StatCard
-            title="Active Threats"
+            title="Active"
             value={stats.activeThreats}
             icon={Shield}
             variant={stats.activeThreats > 0 ? 'warning' : 'default'}
           />
           <StatCard
-            title="Packets Analyzed"
+            title="Packets"
             value={packets.length.toLocaleString()}
             icon={Activity}
             variant="default"
@@ -80,23 +80,24 @@ const Index = () => {
         </div>
 
         {/* Main Dashboard Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
           {/* Left Column - Traffic & Threats */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="xl:col-span-2 space-y-4 sm:space-y-6">
             <NetworkTrafficChart />
             
             <div className="cyber-card">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold flex items-center gap-2">
-                  <ShieldAlert className="w-5 h-5 text-destructive" />
-                  Recent Threat Alerts
+                <h3 className="text-base sm:text-lg font-semibold flex items-center gap-2">
+                  <ShieldAlert className="w-4 h-4 sm:w-5 sm:h-5 text-destructive" />
+                  <span className="hidden sm:inline">Recent Threat Alerts</span>
+                  <span className="sm:hidden">Threats</span>
                 </h3>
                 <span className="text-xs text-muted-foreground">
-                  {stats.activeThreats} active, {stats.blockedThreats} blocked
+                  {stats.activeThreats} active
                 </span>
               </div>
-              <ScrollArea className="h-80">
-                <div className="space-y-3 pr-4">
+              <ScrollArea className="h-64 sm:h-80">
+                <div className="space-y-2 sm:space-y-3 pr-4">
                   {allThreats.slice(0, 10).map(threat => (
                     <ThreatAlert
                       key={threat.id}
@@ -110,7 +111,7 @@ const Index = () => {
           </div>
 
           {/* Right Column - AI Analysis, Distribution & Stream */}
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             <AIAnalysisPanel 
               packets={packets} 
               isMonitoring={isMonitoring}
@@ -123,19 +124,18 @@ const Index = () => {
       </main>
       
       {/* Footer Status Bar */}
-      <footer className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-sm border-t border-border py-2 px-4">
+      <footer className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-sm border-t border-border py-2 px-4 z-40">
         <div className="container mx-auto flex items-center justify-between text-xs text-muted-foreground">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             <span className="flex items-center gap-1">
               <span className={`w-2 h-2 rounded-full ${isMonitoring ? 'bg-success animate-pulse' : 'bg-muted-foreground'}`} />
-              System Status: {isMonitoring ? 'Active' : 'Paused'}
+              <span className="hidden sm:inline">System Status:</span> {isMonitoring ? 'Active' : 'Paused'}
             </span>
-            <span>ML Model: v2.4.1</span>
-            <span>Last Scan: {new Date().toLocaleTimeString()}</span>
+            <span className="hidden md:inline">ML Model: v2.4.1</span>
           </div>
-          <div className="flex items-center gap-4">
-            <span>Memory: 2.4GB / 8GB</span>
-            <span>CPU: 34%</span>
+          <div className="flex items-center gap-2 sm:gap-4">
+            <span className="hidden lg:inline">Memory: 2.4GB / 8GB</span>
+            <span className="hidden sm:inline">CPU: 34%</span>
             <span className="text-primary font-mono">SENTINEL v1.0</span>
           </div>
         </div>
