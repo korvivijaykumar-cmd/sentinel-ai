@@ -45,7 +45,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="flex-1 bg-background flex flex-col min-w-0">
       <Header isMonitoring={isMonitoring} onToggleMonitoring={toggleMonitoring} notificationProps={notificationProps} />
       
       <main className="container mx-auto px-4 py-4 sm:py-6 flex-1 pb-16">

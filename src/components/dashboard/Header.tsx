@@ -1,8 +1,10 @@
-import { Shield, Power, Settings, Activity } from 'lucide-react';
+import { Shield, Power, Activity, PanelLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { NotificationSettings } from './NotificationSettings';
 import { UserMenu } from './UserMenu';
+import { ThemeToggle } from '@/components/theme/ThemeToggle';
+import { useSidebar } from '@/components/ui/sidebar';
 
 interface HeaderProps {
   isMonitoring: boolean;
@@ -21,25 +23,32 @@ interface HeaderProps {
 }
 
 export const Header = ({ isMonitoring, onToggleMonitoring, notificationProps }: HeaderProps) => {
+  const { toggleSidebar, isMobile } = useSidebar();
+
   return (
     <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-      <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4">
+      <div className="px-3 sm:px-4 py-3 sm:py-4">
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 sm:gap-3">
-            <div className="relative">
-              <Shield className="w-8 h-8 sm:w-10 sm:h-10 text-primary" />
-              <span className={cn(
-                'absolute -top-1 -right-1 w-2 h-2 sm:w-3 sm:h-3 rounded-full',
-                isMonitoring ? 'bg-success animate-pulse' : 'bg-muted-foreground'
-              )} />
-            </div>
-            <div>
-              <h1 className="text-lg sm:text-xl font-bold text-gradient-cyber">SENTINEL</h1>
-              <p className="text-[10px] sm:text-xs text-muted-foreground hidden sm:block">AI Threat Detection System</p>
-            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleSidebar}
+              className="h-9 w-9"
+            >
+              <PanelLeft className="h-5 w-5" />
+              <span className="sr-only">Toggle sidebar</span>
+            </Button>
+            
+            {isMobile && (
+              <div className="flex items-center gap-2">
+                <Shield className="w-6 h-6 text-primary" />
+                <span className="text-sm font-bold text-gradient-cyber">SENTINEL</span>
+              </div>
+            )}
           </div>
           
-          <div className="flex items-center gap-1 sm:gap-2 md:gap-4">
+          <div className="flex items-center gap-1 sm:gap-2 md:gap-3">
             <div className={cn(
               'hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium',
               isMonitoring 
@@ -64,9 +73,7 @@ export const Header = ({ isMonitoring, onToggleMonitoring, notificationProps }: 
               <NotificationSettings {...notificationProps} />
             )}
             
-            <Button variant="ghost" size="icon" className="hidden sm:flex">
-              <Settings className="w-5 h-5" />
-            </Button>
+            <ThemeToggle />
 
             <UserMenu />
           </div>
