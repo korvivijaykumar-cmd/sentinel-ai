@@ -28,6 +28,7 @@ export interface ThreatStats {
   totalThreats: number;
   blockedThreats: number;
   activeThreats: number;
+  criticalThreats: number;
   packetsAnalyzed: number;
   threatsByType: Record<string, number>;
   threatsBySeverity: Record<string, number>;
@@ -72,6 +73,7 @@ export const useThreatData = (onNewThreat?: (threat: Threat) => void) => {
     totalThreats: 0,
     blockedThreats: 0,
     activeThreats: 0,
+    criticalThreats: 0,
     packetsAnalyzed: 0,
     threatsByType: {},
     threatsBySeverity: {},
@@ -97,6 +99,7 @@ export const useThreatData = (onNewThreat?: (threat: Threat) => void) => {
       totalThreats: currentThreats.length,
       blockedThreats: currentThreats.filter(t => t.status === 'blocked').length,
       activeThreats: currentThreats.filter(t => t.status === 'active').length,
+      criticalThreats: currentThreats.filter(t => t.severity === 'critical').length,
       packetsAnalyzed: packetsCount,
       threatsByType,
       threatsBySeverity,

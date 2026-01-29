@@ -8,10 +8,27 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
+import Threats from "./pages/Threats";
+import Network from "./pages/Network";
+import AIAnalysis from "./pages/AIAnalysis";
+import Reports from "./pages/Reports";
+import Notifications from "./pages/Notifications";
+import Settings from "./pages/Settings";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { AppSidebar } from "./components/navigation/AppSidebar";
 
 const queryClient = new QueryClient();
+
+const ProtectedLayout = ({ children }: { children: React.ReactNode }) => (
+  <ProtectedRoute>
+    <SidebarProvider>
+      <div className="min-h-screen flex w-full">
+        <AppSidebar />
+        {children}
+      </div>
+    </SidebarProvider>
+  </ProtectedRoute>
+);
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -22,20 +39,13 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/auth" element={<Auth />} />
-            <Route 
-              path="/" 
-              element={
-                <ProtectedRoute>
-                  <SidebarProvider>
-                    <div className="min-h-screen flex w-full">
-                      <AppSidebar />
-                      <Index />
-                    </div>
-                  </SidebarProvider>
-                </ProtectedRoute>
-              } 
-            />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="/" element={<ProtectedLayout><Index /></ProtectedLayout>} />
+            <Route path="/threats" element={<ProtectedLayout><Threats /></ProtectedLayout>} />
+            <Route path="/network" element={<ProtectedLayout><Network /></ProtectedLayout>} />
+            <Route path="/ai-analysis" element={<ProtectedLayout><AIAnalysis /></ProtectedLayout>} />
+            <Route path="/reports" element={<ProtectedLayout><Reports /></ProtectedLayout>} />
+            <Route path="/notifications" element={<ProtectedLayout><Notifications /></ProtectedLayout>} />
+            <Route path="/settings" element={<ProtectedLayout><Settings /></ProtectedLayout>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
