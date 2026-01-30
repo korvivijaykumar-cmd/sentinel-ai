@@ -7,7 +7,8 @@ import {
   Settings, 
   BarChart3,
   Brain,
-  Bell
+  Bell,
+  Cpu
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import {
@@ -30,6 +31,7 @@ const mainNavItems = [
   { title: "Threats", url: "/threats", icon: ShieldAlert },
   { title: "Network", url: "/network", icon: Activity },
   { title: "AI Analysis", url: "/ai-analysis", icon: Brain },
+  { title: "System Monitor", url: "/system-monitor", icon: Cpu },
 ];
 
 const secondaryNavItems = [
