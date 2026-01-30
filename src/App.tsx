@@ -14,6 +14,7 @@ import AIAnalysis from "./pages/AIAnalysis";
 import Reports from "./pages/Reports";
 import Notifications from "./pages/Notifications";
 import Settings from "./pages/Settings";
+import SystemMonitor from "./pages/SystemMonitor";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { AppSidebar } from "./components/navigation/AppSidebar";
 
@@ -46,6 +47,8 @@ const App = () => (
             <Route path="/reports" element={<ProtectedLayout><Reports /></ProtectedLayout>} />
             <Route path="/notifications" element={<ProtectedLayout><Notifications /></ProtectedLayout>} />
             <Route path="/settings" element={<ProtectedLayout><Settings /></ProtectedLayout>} />
+            <Route path="/system-monitor" element={<ProtectedLayout><SystemMonitor /></ProtectedLayout>} />
+            <Route path="*" element={<NotFound />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

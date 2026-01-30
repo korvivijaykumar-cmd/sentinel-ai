@@ -2,3 +2,6 @@ project_id = "fhksyktakysfhegrilfd"
 
 [functions.analyze-threat]
 verify_jwt = false
+
+[functions.system-metrics]
+verify_jwt = false

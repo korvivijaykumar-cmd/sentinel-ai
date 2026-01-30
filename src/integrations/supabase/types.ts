@@ -14,6 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
+      detected_threats: {
+        Row: {
+          agent_id: string
+          created_at: string
+          description: string
+          destination_ip: string | null
+          id: string
+          port: number | null
+          process_name: string | null
+          process_pid: number | null
+          protocol: string | null
+          resolved_at: string | null
+          severity: string
+          source_ip: string | null
+          status: string | null
+          threat_type: string
+        }
+        Insert: {
+          agent_id: string
+          created_at?: string
+          description: string
+          destination_ip?: string | null
+          id?: string
+          port?: number | null
+          process_name?: string | null
+          process_pid?: number | null
+          protocol?: string | null
+          resolved_at?: string | null
+          severity: string
+          source_ip?: string | null
+          status?: string | null
+          threat_type: string
+        }
+        Update: {
+          agent_id?: string
+          created_at?: string
+          description?: string
+          destination_ip?: string | null
+          id?: string
+          port?: number | null
+          process_name?: string | null
+          process_pid?: number | null
+          protocol?: string | null
+          resolved_at?: string | null
+          severity?: string
+          source_ip?: string | null
+          status?: string | null
+          threat_type?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -38,6 +89,84 @@ export type Database = {
           id?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      system_metrics: {
+        Row: {
+          agent_id: string
+          cpu_usage: number
+          created_at: string
+          disk_usage: number | null
+          hostname: string
+          id: string
+          memory_total: number | null
+          memory_usage: number
+          memory_used: number | null
+          network_in: number | null
+          network_out: number | null
+        }
+        Insert: {
+          agent_id: string
+          cpu_usage: number
+          created_at?: string
+          disk_usage?: number | null
+          hostname: string
+          id?: string
+          memory_total?: number | null
+          memory_usage: number
+          memory_used?: number | null
+          network_in?: number | null
+          network_out?: number | null
+        }
+        Update: {
+          agent_id?: string
+          cpu_usage?: number
+          created_at?: string
+          disk_usage?: number | null
+          hostname?: string
+          id?: string
+          memory_total?: number | null
+          memory_usage?: number
+          memory_used?: number | null
+          network_in?: number | null
+          network_out?: number | null
+        }
+        Relationships: []
+      }
+      system_processes: {
+        Row: {
+          agent_id: string
+          cpu_percent: number | null
+          created_at: string
+          id: string
+          memory_percent: number | null
+          name: string
+          pid: number
+          status: string | null
+          user_name: string | null
+        }
+        Insert: {
+          agent_id: string
+          cpu_percent?: number | null
+          created_at?: string
+          id?: string
+          memory_percent?: number | null
+          name: string
+          pid: number
+          status?: string | null
+          user_name?: string | null
+        }
+        Update: {
+          agent_id?: string
+          cpu_percent?: number | null
+          created_at?: string
+          id?: string
+          memory_percent?: number | null
+          name?: string
+          pid?: number
+          status?: string | null
+          user_name?: string | null
         }
         Relationships: []
       }
