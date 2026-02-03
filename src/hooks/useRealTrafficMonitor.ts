@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
 export interface RealNetworkRequest {
   id: string;
@@ -158,6 +159,35 @@ const createThreatFromRequest = (request: RealNetworkRequest): RealThreat | null
   };
 };
 
+const saveThreatToDatabase = async (threat: RealThreat) => {
+  try {
+    const { data: session } = await supabase.auth.getSession();
+    
+    const threatData = {
+      agent_id: session?.session?.user?.id || 'browser-agent',
+      threat_type: threat.type,
+      severity: threat.severity,
+      description: threat.description,
+      source_ip: threat.source,
+      destination_ip: threat.target,
+      status: threat.status,
+      protocol: 'HTTPS',
+    };
+
+    const { error } = await supabase
+      .from('detected_threats')
+      .insert(threatData);
+
+    if (error) {
+      console.warn('[TrafficMonitor] Failed to persist threat:', error.message);
+    } else {
+      console.log('[TrafficMonitor] Threat saved to database');
+    }
+  } catch (err) {
+    console.warn('[TrafficMonitor] Error saving threat:', err);
+  }
+};
+
 export const useRealTrafficMonitor = (onNewThreat?: (threat: RealThreat) => void) => {
   const [requests, setRequests] = useState<RealNetworkRequest[]>([]);
   const [threats, setThreats] = useState<RealThreat[]>([]);
@@ -278,6 +308,9 @@ export const useRealTrafficMonitor = (onNewThreat?: (threat: RealThreat) => void
               return updated;
             });
             onNewThreatRef.current?.(threat);
+            
+            // Persist threat to database
+            saveThreatToDatabase(threat);
           }
         }
       });
