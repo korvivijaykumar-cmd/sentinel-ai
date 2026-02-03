@@ -15,6 +15,7 @@ import Reports from "./pages/Reports";
 import Notifications from "./pages/Notifications";
 import Settings from "./pages/Settings";
 import SystemMonitor from "./pages/SystemMonitor";
+import ThreatHistory from "./pages/ThreatHistory";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { AppSidebar } from "./components/navigation/AppSidebar";
 
@@ -48,7 +49,7 @@ const App = () => (
             <Route path="/notifications" element={<ProtectedLayout><Notifications /></ProtectedLayout>} />
             <Route path="/settings" element={<ProtectedLayout><Settings /></ProtectedLayout>} />
             <Route path="/system-monitor" element={<ProtectedLayout><SystemMonitor /></ProtectedLayout>} />
-            <Route path="*" element={<NotFound />} />
+            <Route path="/threat-history" element={<ProtectedLayout><ThreatHistory /></ProtectedLayout>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
