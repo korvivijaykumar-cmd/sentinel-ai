@@ -8,10 +8,13 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Header } from '@/components/dashboard/Header';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useThreatData } from '@/hooks/useThreatData';
+import { useAlertChannels } from '@/hooks/useAlertChannels';
+import { AlertChannelSettings } from '@/components/notifications/AlertChannelSettings';
 
 const Notifications = () => {
   const { settings, permissionStatus, notifyThreat, toggleSound, toggleBrowserNotifications, updateSettings, playAlertSound } = useNotifications();
   const { threats, isMonitoring, toggleMonitoring } = useThreatData(notifyThreat);
+  const { settings: alertSettings, updateSettings: updateAlertSettings, testAlertChannels, isSending } = useAlertChannels();
 
   const notificationProps = {
     soundEnabled: settings.soundEnabled,
@@ -137,6 +140,14 @@ const Notifications = () => {
                 </Button>
               </CardContent>
             </Card>
+
+            {/* External Alert Channels */}
+            <AlertChannelSettings
+              settings={alertSettings}
+              onUpdateSettings={updateAlertSettings}
+              onTestAlerts={testAlertChannels}
+              isSending={isSending}
+            />
           </div>
 
           {/* Notification History */}

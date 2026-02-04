@@ -1,6 +1,7 @@
 import { Shield, ShieldAlert, ShieldCheck, Activity } from 'lucide-react';
 import { useRealTrafficMonitor, RealThreat } from '@/hooks/useRealTrafficMonitor';
 import { useNotifications } from '@/hooks/useNotifications';
+import { useThreatAlertIntegration } from '@/hooks/useThreatAlertIntegration';
 import { Header } from '@/components/dashboard/Header';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { RealThreatAlert } from '@/components/dashboard/RealThreatAlert';
@@ -24,8 +25,12 @@ const Index = () => {
     playAlertSound,
   } = useNotifications();
 
-  // Convert RealThreat to the format expected by notifyThreat
+  // External alert integration (email/SMS)
+  const { handleNewThreat: sendExternalAlert, alertsEnabled } = useThreatAlertIntegration();
+
+  // Convert RealThreat to the format expected by notifyThreat and send external alerts
   const handleNewThreat = useCallback((threat: RealThreat) => {
+    // Browser notifications and sound
     notifyThreat({
       id: threat.id,
       type: threat.type as any,
@@ -37,7 +42,10 @@ const Index = () => {
       status: threat.status,
       description: threat.description,
     });
-  }, [notifyThreat]);
+
+    // External alerts (email/SMS)
+    sendExternalAlert(threat);
+  }, [notifyThreat, sendExternalAlert]);
 
   const { 
     requests, 

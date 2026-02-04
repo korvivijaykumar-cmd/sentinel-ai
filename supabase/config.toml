@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.system-metrics]
 verify_jwt = false
+
+[functions.send-threat-alert]
+verify_jwt = false
